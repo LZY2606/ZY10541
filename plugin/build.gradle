@@ -1,0 +1,51 @@
+plugins {
+    id 'java-gradle-plugin'
+    alias(libs.plugins.kotlin.jvm)
+    alias(libs.plugins.mavenPublish)
+    alias(libs.plugins.gradlePluginPublish)
+    alias(libs.plugins.shadow)
+}
+
+group = ext.GROUP
+version = ext.VERSION_NAME
+
+mavenPublishing {
+    publishToMavenCentral(true)
+    signAllPublications()
+    pomFromGradleProperties()
+}
+
+gradlePlugin {
+    website = "https://github.com/littlerobots/version-catalog-update-plugin"
+    vcsUrl = "https://github.com/littlerobots/version-catalog-update-plugin.git"
+
+    plugins {
+        create("versionCatalogUpdate") {
+            id = "nl.littlerobots.version-catalog-update"
+            displayName = "A plugin that updates the version catalog file."
+            description =
+                    "Provides tasks to format and update the version catalog file with the latest dependency versions."
+            implementationClass = "nl.littlerobots.vcu.plugin.VersionCatalogUpdatePlugin"
+            tags = ["version", "catalog", "dependencies", "versions"]
+        }
+    }
+}
+
+kotlin {
+    jvmToolchain(11)
+}
+
+tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+    mergeServiceFiles()
+    relocate 'com.fasterxml.jackson', "shadow.com.fasterxml.jackson"
+    archiveClassifier.set("")
+}
+
+configurations.api.dependencies.remove dependencies.gradleApi()
+
+dependencies {
+    implementation(project(path: ":catalog"))
+    shadow gradleApi()
+    testImplementation libs.junit
+    testImplementation gradleTestKit()
+}

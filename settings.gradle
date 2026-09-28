@@ -1,0 +1,19 @@
+pluginManagement {
+    dependencyResolutionManagement {
+        repositories {
+            mavenCentral()
+            gradlePluginPortal()
+        }
+    }
+}
+
+dependencyResolutionManagement {
+    repositories {
+        mavenCentral()
+        google()
+        maven { url "https://storage.googleapis.com/r8-releases/raw/"}
+    }
+}
+
+include ":catalog"
+include ":plugin"
